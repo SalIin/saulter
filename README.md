@@ -28,6 +28,12 @@ Go to the frontend project directory
   cd ../client
 ```
 
+Install the dependencies
+
+```bash
+  yarn
+```
+
 Run client application
 
 ```bash
@@ -43,3 +49,9 @@ Run client application
 - Data fetching - I have used React Query to fetch the data from the backend. This approach let me use the cache and deduplicate requests to the server.
 
 - UI framework - Chakra UI was used for styling. This tool allows to make responsive layouts very fast and easy.
+
+## Improvements which need to be done:
+
+- display / hide password button
+- programmatically sign in the user after the register
+- display the currently logged in user info
