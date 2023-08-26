@@ -1,5 +1,4 @@
-import { Icon, Text, Flex } from "@chakra-ui/react";
-import { IoMdCloseCircle } from "react-icons/io";
+import { Text } from "@chakra-ui/react";
 import { ErrorMessage as ChakraErrorMessage } from "@hookform/error-message";
 
 interface ErrorMessageProps {

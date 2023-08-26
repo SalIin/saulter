@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { API } from "../constants/api";
 
 import {
@@ -35,7 +33,7 @@ export const createRoute = async (
   }
 };
 
-export const getAllRoutes = async (token: string, currentUserId: string) => {
+export const getAllRoutes = async (token: string) => {
   try {
     const res = await fetch(API.ROUTES, {
       headers: {
@@ -49,12 +47,7 @@ export const getAllRoutes = async (token: string, currentUserId: string) => {
       throw new Error(data.error ?? data.message);
     }
 
-    const modifiedRoutes = data.map((route) => {
-      route.favorited = route.favorites.includes(currentUserId);
-      return route;
-    });
-
-    return modifiedRoutes;
+    return data;
   } catch (e) {
     const message = e instanceof Error ? e.message : "Unknown error occured";
 

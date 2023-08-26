@@ -2,9 +2,11 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 import { search } from "../utils/debouncedSearch";
 
+import { RouteInterface } from "../../../types/route";
+
 export const useSearch = (
-  initialRoutes: any[],
-  setRoutes: Dispatch<SetStateAction<any[]>>
+  initialRoutes: RouteInterface[],
+  setRoutes: Dispatch<SetStateAction<RouteInterface[] | null>>
 ) => {
   const [searchString, setSearchString] = useState("");
 

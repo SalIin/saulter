@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction } from "react";
 import { List, ListItem, VStack } from "@chakra-ui/react";
 
 import Searchbar from "./components/Searchbar";
@@ -14,7 +14,7 @@ import { useQueryClient } from "react-query";
 interface RoutesProps {
   routes: RouteInterface[];
   onRouteSelected: (id: RouteInterface["id"]) => void;
-  setRenderRoutes: Dispatch<SetStateAction<RouteInterface[]>>;
+  setRenderRoutes: Dispatch<SetStateAction<RouteInterface[] | null>>;
 }
 
 export const Routes: React.FC<RoutesProps> = ({

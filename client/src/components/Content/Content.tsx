@@ -18,29 +18,18 @@ import { useRenderRoutes } from "../../hooks/useRenderRoutes";
 export const Content: React.FC = () => {
   const layout = useBreakpointValue({ base: "mobile", lg: "desktop" });
 
-  const { user } = useAuthState();
-
-  const { data: routes, isLoading } = useQuery<RouteInterface[]>(
-    "routes",
-    () => getAllRoutes(user?.accessToken ?? "", user?.id ?? ""),
-    {
-      cacheTime: Infinity,
-      staleTime: Infinity,
-      enabled: !!user,
-    }
-  );
-
   const {
+    isLoading,
     choosedRouteId,
     renderRoutes,
     handleChooseRoute,
     resetChoosedRoute,
     setRenderRoutes,
-  } = useRenderRoutes(routes ?? []);
+  } = useRenderRoutes();
 
-  if (isLoading || !routes) return <Loader />;
+  if (isLoading || !renderRoutes) return <Loader />;
 
-  if (!routes.length) return <EmptyRoutes />;
+  if (!renderRoutes.length) return <EmptyRoutes />;
 
   const route = renderRoutes.find(({ id }) => id === choosedRouteId);
   const isMobile = layout === "mobile";
