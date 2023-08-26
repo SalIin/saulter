@@ -43,5 +43,3 @@ Run client application
 - Data fetching - I have used React Query to fetch the data from the backend. This approach let me use the cache and deduplicate requests to the server.
 
 - UI framework - Chakra UI was used for styling. This tool allows to make responsive layouts very fast and easy.
-
--
