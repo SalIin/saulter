@@ -22,7 +22,7 @@ export const Content: React.FC = () => {
 
   const { data: routes, isLoading } = useQuery<RouteInterface[]>(
     "routes",
-    () => getAllRoutes(user?.accessToken ?? ""),
+    () => getAllRoutes(user?.accessToken ?? "", user?.id ?? ""),
     {
       cacheTime: Infinity,
       staleTime: Infinity,
