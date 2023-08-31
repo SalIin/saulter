@@ -12,7 +12,7 @@ export const getRoute = async (waypoints: Waypoints) => {
   const query = await fetch(qs);
   const json = await query.json();
 
-  const data = json.routes[0];
+  const route = json.routes[0];
 
-  console.log(data);
+  return route;
 };

@@ -23,6 +23,15 @@ export const useMap = () => {
       zoom: 9,
     });
 
+    map.loadImage(
+      "https://img.icons8.com/?size=512&id=21612&format=png",
+      (err, image) => {
+        if (err || !image) throw err;
+
+        map.addImage("marker", image);
+      }
+    );
+
     setMap(map);
   };
 
@@ -65,7 +74,7 @@ export const useMap = () => {
       } else {
         map.addLayer({
           id: markerId,
-          type: "circle",
+          type: "symbol",
           source: {
             type: "geojson",
             data: {
@@ -82,14 +91,91 @@ export const useMap = () => {
               ],
             },
           },
-          paint: {
-            "circle-radius": 7,
-            "circle-color": "#669efd",
+          layout: {
+            "icon-image": "marker",
+            "icon-size": 0.05,
+            "icon-anchor": "bottom",
+            "symbol-sort-key": 20,
+            "icon-allow-overlap": true,
           },
         });
+
+        initMarkerListeners(markerId);
       }
     });
   };
 
-  return { map, mapContainer, waypoints, initMap, initListeners, paintMarkers };
+  const paintRoute = (route: any) => {
+    if (!map) return;
+
+    const coordinates = route.geometry.coordinates;
+
+    const geojson: GeoJSON.Feature<GeoJSON.Geometry> = {
+      type: "Feature",
+      properties: {},
+      geometry: {
+        type: "LineString",
+        coordinates,
+      },
+    };
+
+    // if the route already exists on the map, we'll reset it using setData
+    if (map.getSource("route")) {
+      const geoJsonSource = map.getSource("route") as GeoJSONSource;
+      geoJsonSource.setData(geojson);
+    } else {
+      map.addLayer({
+        id: "route",
+        type: "line",
+        source: {
+          type: "geojson",
+          data: geojson,
+        },
+        layout: {
+          "line-join": "round",
+          "line-cap": "round",
+          "line-sort-key": 10,
+        },
+        paint: {
+          "line-color": "#3887be",
+          "line-width": 5,
+          "line-opacity": 0.75,
+        },
+      });
+    }
+  };
+
+  const initMarkerListeners = (markerId: string) => {
+    if (!map) return;
+
+    const canvas = map.getCanvasContainer();
+
+    map.on("mouseenter", markerId, () => {
+      canvas.style.cursor = "move";
+    });
+
+    map.on("mouseleave", markerId, () => {
+      canvas.style.cursor = "";
+    });
+
+    map.on("mousedown", markerId, (e) => {
+      // Prevent the default map drag behavior.
+      e.preventDefault();
+
+      canvas.style.cursor = "grab";
+
+      // map.on('mousemove', onMove);
+      // map.once('mouseup', onUp);
+    });
+  };
+
+  return {
+    map,
+    mapContainer,
+    waypoints,
+    initMap,
+    initListeners,
+    paintMarkers,
+    paintRoute,
+  };
 };
