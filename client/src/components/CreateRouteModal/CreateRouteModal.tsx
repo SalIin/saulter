@@ -11,7 +11,7 @@ import {
 } from "@chakra-ui/react";
 
 import Form from "./components/Form";
-import RouteMap from "../RouteMap";
+import MapboxMap from "../MapboxMap";
 
 import { MarkerInterface } from "../RouteMap/hooks";
 
@@ -58,11 +58,7 @@ export const CreateRouteModal: React.FC<CreateRouteModalProps> = (props) => {
               onRouteCreate={props.onClose}
             />
             <Box flexGrow={{ base: 0, md: 1 }}>
-              <RouteMap
-                markers={markers}
-                setMarkers={setMarkers}
-                onDirectionsChange={calcTotalDistance}
-              />
+              <MapboxMap />
             </Box>
           </Flex>
         </ModalBody>
