@@ -5,9 +5,11 @@ import { useMap } from "./hooks/useMap";
 
 import { getRoute } from "./utils";
 
+import { MapboxMapProps } from "./types";
+
 import "mapbox-gl/dist/mapbox-gl.css";
 
-export const MapboxMap: React.FC = () => {
+export const MapboxMap: React.FC<MapboxMapProps> = ({ onRouteChange }) => {
   const {
     map,
     mapContainer,
@@ -32,7 +34,10 @@ export const MapboxMap: React.FC = () => {
     }
 
     if (waypoints.length >= 2) {
-      getRoute(waypoints).then((route) => paintRoute(route));
+      getRoute(waypoints).then((route) => {
+        paintRoute(route);
+        onRouteChange(route.distance);
+      });
     }
   }, [waypoints]);
 

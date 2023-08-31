@@ -28,15 +28,10 @@ export const CreateRouteModal: React.FC<CreateRouteModalProps> = (props) => {
     setMarkers([]);
     setRouteLength(0);
   };
-  const calcTotalDistance = (directions: google.maps.DirectionsResult) => {
-    const distanceInMeters = directions.routes[0].legs.reduce(
-      (acc, { distance }) => acc + distance!.value ?? 0,
-      0
-    );
+  const handleRouteChange = (length: number) => {
+    const lengthInKilometers = length / 1000;
 
-    const distanceInKilometers = distanceInMeters / 1000;
-
-    setRouteLength(distanceInKilometers);
+    setRouteLength(lengthInKilometers);
   };
 
   return (
@@ -58,7 +53,7 @@ export const CreateRouteModal: React.FC<CreateRouteModalProps> = (props) => {
               onRouteCreate={props.onClose}
             />
             <Box flexGrow={{ base: 0, md: 1 }}>
-              <MapboxMap />
+              <MapboxMap onRouteChange={handleRouteChange} />
             </Box>
           </Flex>
         </ModalBody>
