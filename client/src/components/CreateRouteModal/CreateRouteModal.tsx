@@ -9,6 +9,7 @@ import {
   ModalHeader,
   ModalOverlay,
 } from "@chakra-ui/react";
+import { LngLat } from "mapbox-gl";
 
 import Form from "./components/Form";
 import MapboxMap from "../MapboxMap";
@@ -28,10 +29,14 @@ export const CreateRouteModal: React.FC<CreateRouteModalProps> = (props) => {
     setMarkers([]);
     setRouteLength(0);
   };
-  const handleRouteChange = (length: number) => {
+  const handleRouteChange = (
+    length: number,
+    markers: Pick<LngLat, "lng" | "lat">[]
+  ) => {
     const lengthInKilometers = length / 1000;
 
     setRouteLength(lengthInKilometers);
+    setMarkers(markers);
   };
 
   return (

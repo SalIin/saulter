@@ -7,6 +7,8 @@ import { getRoute } from "./utils";
 
 import { MapboxMapProps } from "./types";
 
+import { METRICS } from "../../constants/metrics";
+
 import "mapbox-gl/dist/mapbox-gl.css";
 
 export const MapboxMap: React.FC<MapboxMapProps> = ({ onRouteChange }) => {
@@ -36,10 +38,18 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ onRouteChange }) => {
     if (waypoints.length >= 2) {
       getRoute(waypoints).then((route) => {
         paintRoute(route);
-        onRouteChange(route.distance);
+
+        const formattedWaypoints = waypoints.map(({ coordinates }) => ({
+          lng: coordinates[0],
+          lat: coordinates[1],
+        }));
+
+        !!onRouteChange && onRouteChange(route.distance, formattedWaypoints);
       });
     }
   }, [waypoints]);
 
-  return <Box ref={mapContainer} h="full" w="full" />;
+  return (
+    <Box ref={mapContainer} h="full" w="full" minH={METRICS.MIN_MAP_HEIGHT} />
+  );
 };

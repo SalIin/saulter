@@ -15,6 +15,7 @@ import { useToggleFavoriteRoute } from "../../hooks/useToggleFavoriteRoute";
 import { RouteInterface } from "../../types/route";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import { useAuthState } from "../../context/AuthProvider/hooks";
+import MapboxMap from "../MapboxMap";
 
 interface RouteDetailsProps extends RouteInterface {
   onNavigateBack: VoidFunction;
@@ -64,7 +65,8 @@ export const RouteDetails: React.FC<RouteDetailsProps> = ({
         <Heading color="brand.500">{length}</Heading>
       </Flex>
       <Text>{description}</Text>
-      <RouteMap markers={markers} editable={false} />
+      {/* <RouteMap markers={markers} editable={false} /> */}
+      <MapboxMap />
       <HStack w="full">
         <Button
           w={displayDeleteButton ? "50%" : "100%"}
