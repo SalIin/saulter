@@ -1,2 +1,7 @@
 export type Map = mapboxgl.Map | null;
-export type Waypoints = [number, number][];
+export type Waypoints = Waypoint[];
+
+interface Waypoint {
+  id: string;
+  coordinates: [number, number];
+}

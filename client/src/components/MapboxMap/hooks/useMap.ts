@@ -1,5 +1,6 @@
-import mapboxgl, { GeoJSONSource } from "mapbox-gl";
 import { useRef, useState } from "react";
+import { v4 as uuid } from "uuid";
+import mapboxgl, { GeoJSONSource } from "mapbox-gl";
 
 import { CENTER } from "../constants";
 
@@ -13,6 +14,9 @@ export const useMap = () => {
   const [map, setMap] = useState<Map>(null);
 
   const [waypoints, setWaypoints] = useState<Waypoints | []>([]);
+
+  let moveHandler: any;
+  let upHandler: any;
 
   const initMap = () => {
     const map = new mapboxgl.Map({
@@ -43,16 +47,14 @@ export const useMap = () => {
         (key) => event.lngLat[key as "lng" | "lat"]
       ) as [number, number];
 
-      setWaypoints((prev) => [...prev, coordinates]);
+      setWaypoints((prev) => [...prev, { id: uuid(), coordinates }]);
     });
   };
 
   const paintMarkers = () => {
     if (!map) return;
 
-    waypoints.forEach((waypoint, idx) => {
-      const markerId = `marker-${idx}`;
-
+    waypoints.forEach(({ id, coordinates }) => {
       const point: GeoJSON.FeatureCollection<GeoJSON.Geometry> = {
         type: "FeatureCollection",
         features: [
@@ -61,19 +63,19 @@ export const useMap = () => {
             properties: {},
             geometry: {
               type: "Point",
-              coordinates: waypoint,
+              coordinates,
             },
           },
         ],
       };
 
-      if (map.getLayer(markerId)) {
-        const geoJsonSource = map.getSource(markerId) as GeoJSONSource;
+      if (map.getLayer(id)) {
+        const geoJsonSource = map.getSource(id) as GeoJSONSource;
 
         geoJsonSource.setData(point);
       } else {
         map.addLayer({
-          id: markerId,
+          id: id,
           type: "symbol",
           source: {
             type: "geojson",
@@ -85,7 +87,7 @@ export const useMap = () => {
                   properties: {},
                   geometry: {
                     type: "Point",
-                    coordinates: waypoint,
+                    coordinates,
                   },
                 },
               ],
@@ -100,7 +102,7 @@ export const useMap = () => {
           },
         });
 
-        initMarkerListeners(markerId);
+        initMarkerListeners(id);
       }
     });
   };
@@ -159,15 +161,84 @@ export const useMap = () => {
     });
 
     map.on("mousedown", markerId, (e) => {
-      // Prevent the default map drag behavior.
       e.preventDefault();
 
       canvas.style.cursor = "grab";
 
-      // map.on('mousemove', onMove);
-      // map.once('mouseup', onUp);
+      moveHandler = createMoveHandler(onMarkerMove, markerId);
+      upHandler = createMoveHandler(onMarkerUp, markerId);
+
+      map.on("mousemove", moveHandler);
+      map.once("mouseup", upHandler);
     });
   };
+
+  const onMarkerMove = (
+    e: (mapboxgl.MapMouseEvent | mapboxgl.MapTouchEvent) & mapboxgl.EventData,
+    markerId: string
+  ) => {
+    if (!map) return;
+
+    const canvas = map.getCanvasContainer();
+
+    const coordinates = e.lngLat;
+
+    canvas.style.cursor = "grabbing";
+
+    const point: GeoJSON.FeatureCollection<GeoJSON.Geometry> = {
+      type: "FeatureCollection",
+      features: [
+        {
+          type: "Feature",
+          properties: {},
+          geometry: {
+            type: "Point",
+            coordinates: [coordinates.lng, coordinates.lat],
+          },
+        },
+      ],
+    };
+
+    const geoJsonSource = map.getSource(markerId) as GeoJSONSource;
+
+    geoJsonSource.setData(point);
+  };
+
+  const onMarkerUp = (
+    e: mapboxgl.MapMouseEvent & mapboxgl.EventData,
+    markerId: string
+  ) => {
+    if (!map) return;
+
+    const coordinates = e.lngLat;
+
+    const movedMarkerIdx = waypoints.findIndex(({ id }) => id === markerId);
+
+    setWaypoints((prev) => {
+      const shallowWaypoints = [...prev];
+
+      const [removedWaypoint] = shallowWaypoints.splice(movedMarkerIdx, 1);
+      shallowWaypoints.splice(movedMarkerIdx, 0, {
+        ...removedWaypoint,
+        coordinates: [coordinates.lng, coordinates.lat],
+      });
+
+      return shallowWaypoints;
+    });
+
+    const canvas = map.getCanvasContainer();
+
+    canvas.style.cursor = "";
+
+    // Unbind mouse/touch events
+    map.off("mousemove", moveHandler);
+    map.off("touchmove", upHandler);
+  };
+
+  const createMoveHandler =
+    (callback: any, markerId: string) => (event: any) => {
+      callback(event, markerId);
+    };
 
   return {
     map,

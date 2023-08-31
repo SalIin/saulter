@@ -34,7 +34,7 @@ export const MapboxMap: React.FC = () => {
     if (waypoints.length >= 2) {
       getRoute(waypoints).then((route) => paintRoute(route));
     }
-  }, [waypoints.length]);
+  }, [waypoints]);
 
   return <Box ref={mapContainer} h="full" w="full" />;
 };
