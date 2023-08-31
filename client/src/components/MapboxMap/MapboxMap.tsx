@@ -1,29 +1,34 @@
-import mapboxgl from "mapbox-gl";
+import { useEffect } from "react";
 import { Box } from "@chakra-ui/react";
-import { useEffect, useRef, useState } from "react";
-
-import { CENTER } from "./constants";
-
-import { initMap } from "./utils";
 
 import MarkerIcon from "../../assets/icons/marker_ic.svg";
 
-import "mapbox-gl/dist/mapbox-gl.css";
+import { useMap } from "./hooks/useMap";
 
-mapboxgl.accessToken =
-  "pk.eyJ1IjoiYmlsb2tyeW55dHNreWkiLCJhIjoiY2xseTZkcjQ0MDhtNjNkbWh3M3lydmpvYyJ9.0a-BByF9sOy1LfdlT2KX9g";
+import "mapbox-gl/dist/mapbox-gl.css";
+import { getRoute } from "./utils";
 
 export const MapboxMap: React.FC = () => {
-  const mapContainer = useRef<HTMLDivElement | null>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
-
-  const [zoom, setZoom] = useState(9);
+  const { map, mapContainer, waypoints, initMap, initListeners, paintMarkers } =
+    useMap();
 
   useEffect(() => {
-    if (map.current) return;
+    if (!map) {
+      initMap();
+    } else {
+      initListeners();
+    }
+  }, [map]);
 
-    initMap(map, mapContainer, CENTER, zoom);
-  });
+  useEffect(() => {
+    if (waypoints.length) {
+      paintMarkers();
+    }
+
+    if (waypoints.length >= 2) {
+      getRoute(waypoints);
+    }
+  }, [waypoints]);
 
   return <Box ref={mapContainer} h="full" w="full" />;
 };

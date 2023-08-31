@@ -1,17 +1,18 @@
 import mapboxgl from "mapbox-gl";
-import { MutableRefObject } from "react";
 
-export const initMap = (
-  map: MutableRefObject<mapboxgl.Map | null>,
-  mapContainer: MutableRefObject<HTMLDivElement | null>,
-  center: [number, number],
-  zoom: number
-) => {
-  map.current = new mapboxgl.Map({
-    // @ts-ignore
-    container: mapContainer.current,
-    style: "mapbox://styles/mapbox/navigation-night-v1",
-    center,
-    zoom,
-  });
+import { Waypoints } from "../types";
+
+export const getRoute = async (waypoints: Waypoints) => {
+  const waypointsCoordinates = waypoints
+    .map((waypoint) => `${waypoint[0]},${waypoint[1]}`)
+    .join(";");
+
+  const qs = `https://api.mapbox.com/directions/v5/mapbox/walking/${waypointsCoordinates}?steps=true&geometries=geojson&access_token=${mapboxgl.accessToken}`;
+
+  const query = await fetch(qs);
+  const json = await query.json();
+
+  const data = json.routes[0];
+
+  console.log(data);
 };
