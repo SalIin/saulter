@@ -11,7 +11,11 @@ import { METRICS } from "../../constants/metrics";
 
 import "mapbox-gl/dist/mapbox-gl.css";
 
-export const MapboxMap: React.FC<MapboxMapProps> = ({ onRouteChange }) => {
+export const MapboxMap: React.FC<MapboxMapProps> = ({
+  editable = true,
+  initialMarkers = [],
+  onRouteChange,
+}) => {
   const {
     map,
     mapContainer,
@@ -20,15 +24,21 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ onRouteChange }) => {
     initListeners,
     paintMarkers,
     paintRoute,
-  } = useMap();
+  } = useMap(initialMarkers, editable);
 
+  // Initial map
   useEffect(() => {
     if (!map) {
       initMap();
     } else {
-      initListeners();
+      editable && initListeners();
     }
   }, [map]);
+
+  // Reinit map on choosed route change
+  useEffect(() => {
+    if (initialMarkers.length) initMap();
+  }, [initialMarkers]);
 
   useEffect(() => {
     if (waypoints.length) {

@@ -65,8 +65,7 @@ export const RouteDetails: React.FC<RouteDetailsProps> = ({
         <Heading color="brand.500">{length}</Heading>
       </Flex>
       <Text>{description}</Text>
-      {/* <RouteMap markers={markers} editable={false} /> */}
-      <MapboxMap />
+      <MapboxMap initialMarkers={markers} editable={false} />
       <HStack w="full">
         <Button
           w={displayDeleteButton ? "50%" : "100%"}

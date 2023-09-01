@@ -1,6 +1,6 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { v4 as uuid } from "uuid";
-import mapboxgl, { GeoJSONSource } from "mapbox-gl";
+import mapboxgl, { GeoJSONSource, LngLat } from "mapbox-gl";
 
 import { CENTER } from "../constants";
 
@@ -8,7 +8,19 @@ import { Map, Waypoints } from "../types";
 
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_API_KEY ?? "";
 
-export const useMap = () => {
+const intitWaypoints = (
+  markers: Pick<LngLat, "lng" | "lat">[]
+): Waypoints | [] => {
+  return markers.map(({ lat, lng }) => ({
+    id: uuid(),
+    coordinates: [lng, lat],
+  }));
+};
+
+export const useMap = (
+  initialMarkers: Pick<LngLat, "lng" | "lat">[],
+  isMapEditable: boolean
+) => {
   const mapContainer = useRef<HTMLDivElement | null>(null);
 
   const [map, setMap] = useState<Map>(null);
@@ -27,16 +39,18 @@ export const useMap = () => {
       zoom: 9,
     });
 
-    map.loadImage(
-      "https://img.icons8.com/?size=512&id=21612&format=png",
-      (err, image) => {
-        if (err || !image) throw err;
+    map.on("load", () => {
+      map.loadImage(
+        "https://img.icons8.com/?size=512&id=21612&format=png",
+        (err, image) => {
+          if (err || !image) throw err;
 
-        map.addImage("marker", image);
-      }
-    );
+          map.addImage("marker", image);
+        }
+      );
 
-    setMap(map);
+      setMap(map);
+    });
   };
 
   const initListeners = () => {
@@ -102,7 +116,7 @@ export const useMap = () => {
           },
         });
 
-        initMarkerListeners(id);
+        isMapEditable && initMarkerListeners(id);
       }
     });
   };
@@ -239,6 +253,12 @@ export const useMap = () => {
     (callback: any, markerId: string) => (event: any) => {
       callback(event, markerId);
     };
+
+  useEffect(() => {
+    if (initialMarkers.length && map) {
+      setWaypoints(intitWaypoints(initialMarkers));
+    }
+  }, [map, initialMarkers]);
 
   return {
     map,
