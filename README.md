@@ -2,6 +2,8 @@
 
 Fullstack application that allows users to manage hiking routes. The application should consist of a front-end using React and a back-end using Nest.js
 
+P.S. Application consists of 2 versions. The version with Google Maps (without dnd) & the another one with Mapbox (with dnd). To use Google Maps version, run application from "main" branch. To use Mapbox version, run application from "migrate-to-mapbox" branch
+
 ## Run Locally
 
 Clone the project
